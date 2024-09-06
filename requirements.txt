@@ -1,5 +1,5 @@
 Flask==2.2.2
 joblib==1.2.0
-tensorflow==1.8.0  # Adjust this to match the version of TensorFlow you are using
+tensorflow== 2.17.0 # Adjust this to match the version of TensorFlow you are using
 pandas==1.5.3
 scikit-learn==1.1.3  # Required for the scaler if created with scikit-learn
