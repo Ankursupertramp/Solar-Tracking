@@ -25,10 +25,9 @@ def predict_tilt_angle(model, month, day, hour, temperature, humidity, ghi):
         input_scaled = scaler.transform(input_data)
 
         # Predict the tilt angle using the selected model
-        if isinstance(model, tf.keras.Model):  # ANN model
-            predicted_tilt_angle = model.predict(input_scaled)[0][0]
-        else:  # Random Forest model
-            predicted_tilt_angle = model.predict(input_scaled)[0]
+        # ANN model
+        predicted_tilt_angle = model.predict(input_scaled)[0][0]
+      
 
         # Adjust angle based on the hour
         if 7 <= hour < 13:
