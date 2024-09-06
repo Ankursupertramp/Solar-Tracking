@@ -4,7 +4,7 @@ import tensorflow as tf
 import pandas as pd
 
 # Load the trained ANN model and scaler
-ann_model = tf.keras.models.load_model('ANN_model.h5')
+model = tf.keras.models.load_model('ANN_model.h5')
 scaler = joblib.load('scaler.pkl')
 
 app = Flask(__name__)
