@@ -4,8 +4,7 @@ import tensorflow as tf
 import pandas as pd
 
 # Load the trained models and scaler
-ann_model = tf.keras.models.load_model('ANN_model.h5')
-rf_model = joblib.load('random_forest_model.pkl')  # Updated filename
+ann_model = tf.keras.models.load_model('ANN_model.h5') # Updated filename
 scaler = joblib.load('scaler.pkl')
 
 app = Flask(__name__)
