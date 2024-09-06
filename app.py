@@ -6,23 +6,23 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
 
-# Set up logging
 logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Load the trained ANN model and scaler
 model = None
 scaler = None
 
 def load_model_and_scaler():
     global model, scaler
     try:
+        logger.info("Attempting to load model and scaler...")
         model = tf.keras.models.load_model('ANN_model.h5')
         scaler = joblib.load('scaler.pkl')
-        logging.info("Model and scaler loaded successfully")
+        logger.info("Model and scaler loaded successfully")
     except Exception as e:
-        logging.error(f"Error loading model or scaler: {e}")
+        logger.error(f"Error loading model or scaler: {e}")
 
 load_model_and_scaler()
 
@@ -36,21 +36,26 @@ def predict_tilt_angle(model, month, day, hour, temperature, humidity, ghi):
             'Relative Humidity': [humidity],
             'GHI': [ghi]
         })
-        logging.debug(f"Input data: {input_data}")
+        logger.debug(f"Input data: {input_data}")
         
         input_array = input_data.to_numpy()
         input_scaled = scaler.transform(input_array)
-        logging.debug(f"Scaled input: {input_scaled}")
+        logger.debug(f"Scaled input: {input_scaled}")
         
-        predicted_tilt_angle = model.predict(input_scaled)[0][0]
-        logging.debug(f"Raw predicted angle: {predicted_tilt_angle}")
+        logger.debug("Attempting prediction with model...")
+        predicted_tilt_angle = model.predict(input_scaled)
+        logger.debug(f"Raw model output: {predicted_tilt_angle}")
+        
+        predicted_tilt_angle = predicted_tilt_angle[0][0]
+        logger.debug(f"Extracted predicted angle: {predicted_tilt_angle}")
         
         if 7 <= hour < 13:
             predicted_tilt_angle = -predicted_tilt_angle
+            logger.debug(f"Adjusted angle for hour: {predicted_tilt_angle}")
         
         return float(predicted_tilt_angle)
     except Exception as e:
-        logging.error(f"Error in prediction: {e}")
+        logger.error(f"Error in prediction: {e}", exc_info=True)
         return None
 
 @app.route('/')
@@ -67,7 +72,7 @@ def predict():
         humidity = request.args.get('humidity', type=float)
         ghi = request.args.get('ghi', type=float)
         
-        logging.debug(f"Received parameters: month={month}, day={day}, hour={hour}, temperature={temperature}, humidity={humidity}, ghi={ghi}")
+        logger.debug(f"Received parameters: month={month}, day={day}, hour={hour}, temperature={temperature}, humidity={humidity}, ghi={ghi}")
         
         if None in (month, day, hour, temperature, humidity, ghi):
             return jsonify({'error': 'Missing or invalid query parameters'}), 400
@@ -82,10 +87,10 @@ def predict():
         if tilt_angle is None:
             return jsonify({'error': 'Error in prediction'}), 500
         
-        logging.debug(f"Predicted tilt angle: {tilt_angle}")
+        logger.debug(f"Final predicted tilt angle: {tilt_angle}")
         return jsonify({'angle': tilt_angle})
     except Exception as e:
-        logging.error(f"Error in /predict endpoint: {e}")
+        logger.error(f"Error in /predict endpoint: {e}", exc_info=True)
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
