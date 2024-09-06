@@ -602,81 +602,76 @@
     </div>
     <script>
         function updateValue(inputId, displayId, unit = '') {
-            const input = document.getElementById(inputId);
-            const display = document.getElementById(displayId);
-            display.textContent = input.value + unit;
-            input.oninput = () => display.textContent = input.value + unit;
+    const input = document.getElementById(inputId);
+    const display = document.getElementById(displayId);
+    display.textContent = input.value + unit;
+    input.oninput = () => display.textContent = input.value + unit;
+}
+
+updateValue('hour', 'hourValue');
+updateValue('temperature', 'temperatureValue', '°C');
+updateValue('humidity', 'humidityValue', '%');
+updateValue('ghi', 'ghiValue', ' W/m²');
+
+function updateSunPosition(hour) {
+    const sun = document.querySelector('.sun');
+    const sceneWidth = document.querySelector('.scene').offsetWidth;
+    const sunWidth = sun.offsetWidth;
+    const maxPosition = sceneWidth - sunWidth;
+    if (hour >= 1 && hour <= 12) {
+        sun.style.left = `${maxPosition - ((hour - 1) * (maxPosition / 11))}px`;
+    }
+}
+
+document.getElementById('hour').addEventListener('input', (event) => {
+    const hour = event.target.value;
+    document.getElementById('hourValue').textContent = hour;
+    updateSunPosition(hour);
+});
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const container = document.getElementById('container');
+    sidebar.classList.toggle('open');
+    container.classList.toggle('sidebar-open');
+}
+
+async function tiltPanel() {
+    const month = document.getElementById('month').value;
+    const day = document.getElementById('day').value;
+    const hour = document.getElementById('hour').value;
+    const temperature = document.getElementById('temperature').value;
+    const humidity = document.getElementById('humidity').value;
+    const ghi = document.getElementById('ghi').value;
+
+    try {
+        const response = await fetch(`/predict?month=${month}&day=${day}&hour=${hour}&temperature=${temperature}&humidity=${humidity}&ghi=${ghi}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.error) {
+            throw new Error(data.error);
         }
 
-        updateValue('hour', 'hourValue');
-        updateValue('temperature', 'temperatureValue', '°C');
-        updateValue('humidity', 'humidityValue', '%');
-        updateValue('ghi', 'ghiValue', ' W/m²');
+        const angle = data.angle;
+        const panel = document.getElementById('panel');
+        const angleBox = document.getElementById('angleBox');
 
-        function updateSunPosition(hour) {
-            const sun = document.querySelector('.sun');
-            const sceneWidth = document.querySelector('.scene').offsetWidth;
-            const sunWidth = sun.offsetWidth;
-            const maxPosition = sceneWidth - sunWidth;
-            if (hour >= 1 && hour <= 12) {
-                sun.style.left = `${maxPosition - ((hour - 1) * (maxPosition / 11))}px`;
-            }
+        if (angle !== undefined) {
+            panel.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+            angleBox.textContent = `${angle.toFixed(2)}°`;
+        } else {
+            alert('Error: Invalid angle');
         }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        alert('Error fetching data from the server');
+    }
+}
 
-        document.getElementById('hour').addEventListener('input', (event) => {
-            const hour = event.target.value;
-            document.getElementById('hourValue').textContent = hour;
-            updateSunPosition(hour);
-        });
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const container = document.getElementById('container');
-            sidebar.classList.toggle('open');
-            container.classList.toggle('sidebar-open');
-        }
-
-        async function tiltPanel() {
-            const month = document.getElementById('month').value;
-            const day = document.getElementById('day').value;
-            const hour = document.getElementById('hour').value;
-            const temperature = document.getElementById('temperature').value;
-            const humidity = document.getElementById('humidity').value;
-            const ghi = document.getElementById('ghi').value;
-           
-
-            try {
-                const response = await fetch(`/predict?month=${month}&day=${day}&hour=${hour}&temperature=${temperature}&humidity=${humidity}&ghi=${ghi}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                console.log('Response data:', data);
-
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                const angle = data.angle;
-                const panel = document.getElementById('panel');
-                const angleBox = document.getElementById('angleBox');
-
-                if (angle !== undefined) {
-                    panel.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-                    angleBox.textContent = `${angle.toFixed(2)}°`;
-                } else {
-                    alert('Error: Invalid angle');
-                }
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                alert('Error fetching data from the server');
-            }
-        }
-
-
-         function refreshPage() {
-            location.reload();
-        }
     </script>
 </body>
 </html>
