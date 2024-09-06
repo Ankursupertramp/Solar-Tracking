@@ -4,7 +4,7 @@ import tensorflow as tf
 import pandas as pd
 
 # Load the trained models and scaler
-ann_model = tf.keras.models.load_model('ANN_model.h5') # Updated filename
+ann_model = tf.keras.models.load_model('ANN_model.h5')  # Updated filename
 scaler = joblib.load('scaler.pkl')
 
 app = Flask(__name__)
@@ -21,13 +21,11 @@ def predict_tilt_angle(model, month, day, hour, temperature, humidity, ghi):
             'GHI': [ghi]
         })
 
-        # Scale the input data
-        input_scaled = scaler.transform(input_data)
+        # Convert the input DataFrame to a NumPy array to match the scaler format
+        input_scaled = scaler.transform(input_data.to_numpy())
 
-        # Predict the tilt angle using the selected model
-        # ANN model
+        # Predict the tilt angle using the ANN model
         predicted_tilt_angle = model.predict(input_scaled)[0][0]
-      
 
         # Adjust angle based on the hour
         if 7 <= hour < 13:
@@ -58,12 +56,11 @@ def predict():
         if None in (month, day, hour, temperature, humidity, ghi):
             return jsonify({'error': 'Missing or invalid query parameters'}), 400
 
-        if algorithm == 'ANN':
-            model = ann_model
-        else:
+        # Check the algorithm parameter
+        if algorithm != 'ANN':
             return jsonify({'error': 'Invalid algorithm selection'}), 400
 
-        tilt_angle = predict_tilt_angle(model, month, day, hour, temperature, humidity, ghi)
+        tilt_angle = predict_tilt_angle(ann_model, month, day, hour, temperature, humidity, ghi)
 
         if tilt_angle is None:
             return jsonify({'error': 'Error in prediction'}), 500
@@ -73,4 +70,5 @@ def predict():
     except Exception as e:
         print(f"Error in /predict endpoint: {e}")
         return jsonify({'error': str(e)}), 500
+
 
