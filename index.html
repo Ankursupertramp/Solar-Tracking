@@ -643,10 +643,10 @@
             const temperature = document.getElementById('temperature').value;
             const humidity = document.getElementById('humidity').value;
             const ghi = document.getElementById('ghi').value;
-            const algorithm = document.getElementById('algorithm').value;
+           
 
             try {
-                const response = await fetch(`/predict?month=${month}&day=${day}&hour=${hour}&temperature=${temperature}&humidity=${humidity}&ghi=${ghi}&algorithm=${algorithm}`);
+                const response = await fetch(`/predict?month=${month}&day=${day}&hour=${hour}&temperature=${temperature}&humidity=${humidity}&ghi=${ghi}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
