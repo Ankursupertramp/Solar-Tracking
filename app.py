@@ -9,7 +9,7 @@ scaler = joblib.load('scaler.pkl')
 
 app = Flask(__name__)
 
-def predict_tilt_angle(model, month, day, hour, temperature, humidity, ghi):
+def predict_tilt_angle(month, day, hour, temperature, humidity, ghi):
     try:
         # Create a DataFrame with the input values
         input_data = pd.DataFrame({
