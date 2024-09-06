@@ -60,8 +60,6 @@ def predict():
 
         if algorithm == 'ANN':
             model = ann_model
-        elif algorithm == 'RandomForest':
-            model = rf_model
         else:
             return jsonify({'error': 'Invalid algorithm selection'}), 400
 
