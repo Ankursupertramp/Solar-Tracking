@@ -1,11 +1,19 @@
+import os
+import logging
 from flask import Flask, jsonify, request, send_from_directory
 import joblib
 import tensorflow as tf
 import pandas as pd
 
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+
 # Load the trained ANN model and scaler
-model = tf.keras.models.load_model('ANN_model.h5')
-scaler = joblib.load('scaler.pkl')
+try:
+    model = tf.keras.models.load_model('ANN_model.h5')
+    scaler = joblib.load('scaler.pkl')
+except Exception as e:
+    logging.error(f"Error loading model or scaler: {e}")
 
 app = Flask(__name__)
 
@@ -66,3 +74,8 @@ def predict():
     except Exception as e:
         print(f"Error in /predict endpoint: {e}")
         return jsonify({'error': str(e)}), 500
+        
+        
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
