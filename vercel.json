@@ -7,7 +7,7 @@
       "config": {
         "maxLambdaSize": "15mb",
         "runtime": "python3.11",
-        "buildCommand": "pip install --upgrade setuptools wheel && pip install --upgrade -r requirements.txt"
+        "buildCommand": "pip install setuptools wheel"
       }
     }
   ],
