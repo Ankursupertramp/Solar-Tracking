@@ -1,5 +1,4 @@
-setuptools
-distutils
+
 absl-py==2.0.0
 aioconsole==0.7.1
 anyio==4.0.0
