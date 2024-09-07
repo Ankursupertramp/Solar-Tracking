@@ -8,4 +8,4 @@ tensorflow-estimator==2.14.0
 tensorflow-intel==2.14.0
 tensorflow-io-gcs-filesystem==0.31.0
 Werkzeug==2.2.2
-python = 3.11.7
+python == 3.11.7
