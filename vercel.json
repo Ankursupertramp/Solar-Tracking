@@ -1,12 +1,12 @@
+
 {
     "version":2,
     "builds": [
         {
-           "src": "app.py",
+            "src":"./index.py",
             "use": "@vercel/python",
-            "config": { "pythonVersion": "3.11" },
+            "config":{"runtime":"python3.11"}
             "buildCommand": "pip install --upgrade pip && pip install -r requirements.txt"
-        }
         }
     ],
     "routes": [
